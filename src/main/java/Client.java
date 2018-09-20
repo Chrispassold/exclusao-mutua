@@ -1,52 +1,34 @@
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Socket;
-import java.util.Objects;
+import java.util.Scanner;
 
-public class Client implements Comparable<Client> {
-    private Integer id;
-    private final Socket socket;
-    private boolean active = true;
+public class Client {
 
-    public Client() throws IOException {
-        socket = new Socket("127.0.0.1", 9999);
-        registerToServer();
+    private static Client instance;
+
+    /**
+     * Referencia para enviar comandos para o servidor
+     */
+    final PrintStream sender;
+
+    /**
+     * Referencia para receber comandos do servidor
+     */
+    final Scanner receiver;
+
+    private Client() throws IOException {
+        Socket cliente = new Socket("127.0.0.1", 9999);
+        sender = new PrintStream(cliente.getOutputStream());
+        receiver = new Scanner(cliente.getInputStream());
     }
 
-    public int getId() {
-        return id;
+    public static void start() throws IOException {
+        if (instance == null) instance = new Client();
     }
 
-    public void registerToServer() {
-        if (this.id != null) return;
-        //register to server
-    }
-
-    public void requestResource() {
-        //Requisita o recurso
-    }
-
-    @Override
-    public int compareTo(Client o) {
-        return this.getId() - o.getId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (id == null || o == null || getClass() != o.getClass()) return false;
-        return id.equals(((Client) o).id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Client{" +
-                "id=" + id +
-                '}';
+    public static void main(String[] args) throws IOException {
+        Client.start();
     }
 
 }
